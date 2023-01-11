@@ -1,0 +1,18 @@
+<%- layout('layouts/boilerplate') %>
+<body>
+    <div class='scoreboard'>
+        <h1>Highscore</h1>
+        <table class='scores'>
+            <tr class='row'>
+                <td class='column'>Rank</td>
+                <td class='column'>Score</td>
+            </tr>
+            <%for (const score of scores) { %>
+                <tr class='row'>
+                    <td class='rank'><%=scores.indexOf(score) + 1 %></td>
+                    <td class='column'><%= score %></td>
+                </tr>
+                <% } %>
+        </table>
+    </div>
+</body>
