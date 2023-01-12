@@ -15,6 +15,10 @@ app.get('/', (req, res) => {
   res.render('leaderboard', {scores: dummy_data})
 })
 
+app.get('/play', (req, res) => {
+  res.render('play.ejs')
+})
+
 app.listen(5000, () => {
   console.log("listening")
 })

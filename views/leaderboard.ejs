@@ -1,16 +1,16 @@
 <%- layout('layouts/boilerplate') %>
 <body>
     <div class='scoreboard'>
-        <h1>Highscore</h1>
+        <h1>Highscores</h1>
         <table class='scores'>
             <tr class='row'>
                 <td class='column'>Rank</td>
                 <td class='column'>Score</td>
             </tr>
-            <%for (const score of scores) { %>
+            <%for (let i = 0; i < 10; i++) { %>
                 <tr class='row'>
-                    <td class='rank'><%=scores.indexOf(score) + 1 %></td>
-                    <td class='column'><%= score %></td>
+                    <td class='rank'><%= i + 1 %></td>
+                    <td class='column'><%= scores[i] ? scores[i] : 0 %></td>
                 </tr>
                 <% } %>
         </table>
