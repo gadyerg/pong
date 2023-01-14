@@ -1,31 +1,84 @@
-const width = 30
-const height = 30
 const screen = document.getElementsByTagName('canvas')[0]
+screen.width = 800
+screen.height = 700
 const ctx = screen.getContext('2d')
 
 //paddle class includes both the player and the cpu objects
-class Paddle {
-  pWidth = 10
-  pHeight = 30
-  constructor(xPos, yPos, velocity) {
-    this.xPos = xPos;
-    this.yPos = yPos;
-    this.velocity = velocity
+
+class GameObject {
+  constructor (width, height, xPos, yPos, yVelocity=0) {
+    this.width = width
+    this.height = height
+    this.xPos = xPos
+    this.yPos = yPos
+    this.yVelocity = yVelocity
   }
 
   draw() {
     ctx.fillStyle = 'white'
-    ctx.fillRect(this.xPos, this.yPos, this.pWidth, this.pHeight)
+    ctx.fillRect(this.xPos, this.yPos, this.width, this.height)
   }
 
   move() {
     this.draw()
-    this.yPos += this.velocity
+    this.onCollision()
+    if ((this.yPos + this.height < 700 && this.yVelocity > 0) || (this.yPos > 0 && this.yVelocity < 0)) {
+      this.yPos += this.yVelocity
+    }
+  }
+
+  onCollision() {
+    if ((this.xPos > ball.xPos || ball.xPos < this.width + this.xPos) && (this.yPos < ball.yPos && ball.yPos < this.yPos + this.height)) {
+      ball.yVelocity *= Math.random() * 10 - 5
+      ball.xVelocity *= -1.05
+    }
   }
 }
 
-const player = new Paddle(5, 60, 0)
-const playerVelocity = 1.5
+class Ball extends GameObject{
+  constructor(width, height, xPos, yPos, yVelocity, xVelocity) {
+    super(width, height, xPos, yPos, yVelocity)
+    this.xVelocity = xVelocity
+  }
+
+  move() {
+    this.draw()
+    if (this.yPos <= 0 || this.yPos + this.height>= screen.height) {
+      this.yVelocity *= -1
+    } 
+      this.yPos += this.yVelocity
+      this.xPos += this.xVelocity
+  }
+}
+
+class Computer extends GameObject{
+  constructor(width, height, xPos, yPos, yVelocity) {
+    super(width, height, xPos, yPos, yVelocity)
+  }
+
+  //sets the enemy paddle to follow the ball and stops any out of bounds
+  //that might happen
+  followBall(yBallPos, ballHeight) {
+    this.draw()
+    this.onCollision()
+    if ((this.yPos + this.height - 75 < 700 && yBallPos < screen.height - this.height + 75) && 
+        (this.yPos > 0 && yBallPos > this.height - 75)) {
+      this.yPos = yBallPos - 75
+    }
+  }
+
+  onCollision() {
+    if ((this.xPos < ball.xPos + ball.width || ball.xPos + ball.width > this.width + this.xPos) && (this.yPos < ball.yPos && ball.yPos < this.yPos + this.height)) {
+      ball.yVelocity *= Math.random() * 10 - 5
+      ball.xVelocity *= -1.2
+    }
+  }
+}
+
+const player = new GameObject(25, 150, 20, 275)
+const ball = new Ball(15, 15, 400, 350, Math.random() * 10 - 5, 1)
+const cpu = new Computer(25, 150, 755, 275)
+const playerVelocity = 15
 
 //object indicates which key is pressed down to avoid movement bug
 const keys = {
@@ -53,26 +106,29 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => {
   switch (event.key) {
     case 'w':
-      player.velocity = 0
+      player.yVelocity = 0
       keys.w.pressed = false
       break
     case 's':
-      player.velocity = 0
+      player.yVelocity = 0
       keys.s.pressed = false
       break
   }
 })
 
+
 function animate () {
   window.requestAnimationFrame(animate)
   ctx.fillStyle = 'black'
   ctx.fillRect(0, 0, screen.width, screen.height)
+  ball.move()
   player.move()
+  cpu.followBall(ball.yPos, ball.height)
   
   if (keys.w.pressed) {
-    player.velocity = - playerVelocity
+    player.yVelocity = - playerVelocity
   } else if (keys.s.pressed) {
-    player.velocity = playerVelocity
+    player.yVelocity = playerVelocity
   }
 }
 
