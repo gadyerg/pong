@@ -1,10 +1,20 @@
 const screen = document.getElementsByTagName('canvas')[0]
+const score = document.getElementById('num_score')
 screen.width = 800
 screen.height = 700
 const ctx = screen.getContext('2d')
 
-//paddle class includes both the player and the cpu objects
+function postScore(score_num) {
+  fetch('/score/new', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({'score': score_num})
+  })
+}
 
+//paddle class includes both the player and the cpu objects
 class GameObject {
   constructor (width, height, xPos, yPos, yVelocity=0) {
     this.width = width
@@ -29,8 +39,11 @@ class GameObject {
 
   onCollision() {
     if ((this.xPos > ball.xPos || ball.xPos < this.width + this.xPos) && (this.yPos < ball.yPos && ball.yPos < this.yPos + this.height)) {
-      ball.yVelocity *= Math.random() * 10 - 5
-      ball.xVelocity *= -1.05
+      ball.yVelocity *= Math.random() * 6 - 3
+      if (ball.xVelocity < 8) {
+        ball.xVelocity *= -1.05
+      }
+      score.textContent = Number(score.textContent) + 10
     }
   }
 }
@@ -43,11 +56,23 @@ class Ball extends GameObject{
 
   move() {
     this.draw()
+    this.onScore()
     if (this.yPos <= 0 || this.yPos + this.height>= screen.height) {
       this.yVelocity *= -1
     } 
       this.yPos += this.yVelocity
       this.xPos += this.xVelocity
+  }
+
+  onScore() {
+    if (ball.xPos <= 0) {
+      postScore(Number(score.textContent))
+      score.textContent = 0
+      ball.xPos = 400
+      ball.yPos = 350
+      ball.xVelocity = 5
+      ball.yVelocity = Math.random() * 6 - 3
+    }
   }
 }
 
@@ -69,14 +94,16 @@ class Computer extends GameObject{
 
   onCollision() {
     if ((this.xPos < ball.xPos + ball.width || ball.xPos + ball.width > this.width + this.xPos) && (this.yPos < ball.yPos && ball.yPos < this.yPos + this.height)) {
-      ball.yVelocity *= Math.random() * 10 - 5
-      ball.xVelocity *= -1.2
+      ball.yVelocity *= Math.random() * 8 - 4
+      if (ball.xVelocity < 8) {
+        ball.xVelocity *= -1.05
+      }
     }
   }
 }
 
 const player = new GameObject(25, 150, 20, 275)
-const ball = new Ball(15, 15, 400, 350, Math.random() * 10 - 5, 1)
+const ball = new Ball(15, 15, 400, 350, Math.random() * 10 - 5, 5)
 const cpu = new Computer(25, 150, 755, 275)
 const playerVelocity = 15
 
