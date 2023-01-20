@@ -86,3 +86,30 @@ footer p {
   font-weight: bold;
   margin: 0;
 }
+
+.error-container {
+  width: 20rem;
+  margin: 0 auto;
+  margin-top: 20rem;
+  text-align: center;
+}
+
+.error-container h1 {
+  font-size: 5rem;
+  margin-bottom: 0;
+  font-weight: bold;
+}
+
+.error-container p {
+  margin-top: .5rem;
+  font-size: 2rem;
+}
+
+.rules {
+  font-size: 2rem;
+  margin-top: 6rem;
+}
+
+.rules li {
+  margin: 3rem;
+}

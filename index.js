@@ -5,8 +5,6 @@ const path = require('path')
 const mongoose = require('mongoose')
 const Score = require('./models/score')
 
-const dummy_data = [500, 300, 235, 123, 45]
-
 mongoose.connect('mongodb://127.0.0.1:27017/pong')
 
 app.engine('ejs', ejsmate)
@@ -17,17 +15,21 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-app.get('/', (req, res) => {
-  res.render('leaderboard', {scores: dummy_data})
+app.get('/', async (req, res) => {
+  const scores = await Score.find().sort({score: -1})
+  res.render('leaderboard', {scores})
 })
 
 app.get('/play', (req, res) => {
   res.render('play.ejs')
 })
 
+app.get('/rules', (req, res)=> {
+  res.render('rules')
+})
+
 app.post('/score/new', async (req, res) =>{
   const topScores = await Score.find().sort({score: -1})
-  console.log(topScores)
   if (topScores[9] == null) {
     const score = new Score({score: req.body.score})
     await score.save()
@@ -36,6 +38,8 @@ app.post('/score/new', async (req, res) =>{
   }
 })
 
-app.listen(5000, () => {
-  console.log("listening")
+app.all('*', (req, res) => {
+  res.render('404')
 })
+
+app.listen(5000)
