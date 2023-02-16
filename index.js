@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config()
+}
+
 const express = require('express')
 const app = express()
 const ejsmate = require('ejs-mate')
@@ -5,7 +9,10 @@ const path = require('path')
 const mongoose = require('mongoose')
 const Score = require('./models/score')
 
-mongoose.connect('mongodb://127.0.0.1:27017/pong')
+const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/pong'
+const port = process.env.PORT || 5000
+
+mongoose.connect(dbUrl).then(console.log('conected'))
 
 app.engine('ejs', ejsmate)
 app.set('views', path.join(__dirname, 'views'))
@@ -42,4 +49,4 @@ app.all('*', (req, res) => {
   res.render('404')
 })
 
-app.listen(5000)
+app.listen(port)

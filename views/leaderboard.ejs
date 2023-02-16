@@ -9,7 +9,7 @@
         <%for (let i = 0; i < 10; i++) { %>
             <tr class='row'>
                 <td class='rank'><%= i + 1 %></td>
-                <td class='column'><%= scores[i].score ? scores[i].score : 0 %></td>
+                <td class='column'><%= scores[i] ? scores[i].score : 0 %></td>
             </tr>
             <% } %>
     </table>
